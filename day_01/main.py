@@ -8,7 +8,13 @@ def part_one(calories_per_elf):
 
 
 def part_two(calories_per_elf):
-    sorted_calories_per_elf = sorted(calories_per_elf, reverse=True)
+    sorted_calories_per_elf = sorted(calories_per_elf, reverse=True, key=sum)
+
+    top_three_elves = sorted_calories_per_elf[:3]
+    calories_of_each_elf = list(map(sum, top_three_elves))
+    calories_of_top_three_elves = sum(calories_of_each_elf)
+
+    return calories_of_top_three_elves
 
 
 def get_calories_per_elf(filename):
