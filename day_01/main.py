@@ -1,34 +1,34 @@
-def part_one(calories_per_elf):
+def part_one(elf_calories):
     most = 0
-    for rations in calories_per_elf:
-        if most < sum(rations):
-            most = sum(rations)
+    for elf in elf_calories:
+        if most < sum(elf):
+            most = sum(elf)
 
     return most
 
 
-def part_two(calories_per_elf):
-    sorted_calories_per_elf = sorted(calories_per_elf, reverse=True, key=sum)
+def part_two(elf_calories):
+    sorted_elf_calories = sorted(elf_calories, reverse=True, key=sum)
 
-    top_three_elves = sorted_calories_per_elf[:3]
-    calories_of_each_elf = list(map(sum, top_three_elves))
-    calories_of_top_three_elves = sum(calories_of_each_elf)
+    top_three_elves = sorted_elf_calories[:3]
+    summed_elf_calories = list(map(sum, top_three_elves))
+    total_calories_top_three_elves = sum(summed_elf_calories)
 
-    return calories_of_top_three_elves
+    return total_calories_top_three_elves
 
 
-def get_calories_per_elf(filename):
+def get_elf_calories(filename):
     with open(filename) as file:
         file_content = file.read().strip()
 
-        calories_per_elf = [
+        elf_calories = [
             list(map(int, line.split("\n"))) for line in file_content.split("\n\n")
         ]
 
-        return calories_per_elf
+        return elf_calories
 
 
-calories_per_elf = get_calories_per_elf("input.txt")
+elf_calories = get_elf_calories("input.txt")
 
-print(part_one(calories_per_elf))
-print(part_two(calories_per_elf))
+print(part_one(elf_calories))
+print(part_two(elf_calories))
