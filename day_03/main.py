@@ -3,16 +3,12 @@ import string
 import pytest
 
 
-def parse_input(text):
-    return text.split("\n")
-
-
 def split_into_compartments(text):
     return [text[: len(text) // 2], text[len(text) // 2 :]]
 
 
-def find_common_item_type(compartments):
-    return "".join(set(compartments[0]).intersection(compartments[1]))
+def find_common_item_type(strings):
+    return "".join(set.intersection(*map(set, strings)))
 
 
 def item_type_value(item_type):
@@ -21,28 +17,34 @@ def item_type_value(item_type):
     else:
         return string.ascii_uppercase.index(item_type) + 27
 
-def part_one():
-    with open("input.txt") as file:
-        file_content = file.read().strip()
-        total = 0
-        for line in file_content.split("\n"):
-            compartments = split_into_compartments(line)
-            common_item_type = find_common_item_type(compartments)
+
+def part_one(lines):
+    total = 0
+    for line in lines:
+        compartments = split_into_compartments(line)
+        common_item_type = find_common_item_type(compartments)
+        total += item_type_value(common_item_type)
+    return total
+
+
+def part_two(lines):
+    total = 0
+    rucksacks = []
+    for idx, line in enumerate(lines):
+        rucksacks.append(line)
+        if (idx + 1) % 3 == 0:
+            common_item_type = find_common_item_type(rucksacks)
             total += item_type_value(common_item_type)
-    print(total)
+            rucksacks.clear()
+    return total
+
 
 if __name__ == "__main__":
-    part_one()
-
-@pytest.mark.parametrize(
-    ("input", "expected"),
-    [
-        ("A Y\nB X\nC Z", ["A Y", "B X", "C Z"]),
-        ("1\n2\n3", ["1", "2", "3"]),
-    ],
-)
-def test_parse_input(input, expected):
-    assert parse_input(input) == expected
+    with open("input.txt") as file:
+        file_content = file.read().strip()
+        lines = file_content.split("\n")
+        print(part_one(lines))
+        print(part_two(lines))
 
 
 @pytest.mark.parametrize(
@@ -62,7 +64,7 @@ def test_split_into_compartments(input, expected):
         (["jqHRNqRjqzjGDLGL", "rsFMfFZSrLrFZsSL"], "L"),
     ],
 )
-def test_split_into_compartments(input, expected):
+def test_find_common_item_type(input, expected):
     assert find_common_item_type(input) == expected
 
 
