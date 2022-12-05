@@ -6,14 +6,10 @@ with open("input.txt") as file:
     total_all_overlap = 0
     total_overlap = 0
     for pair in pairs:
-        first_pair, second_pair = pair.split(",")
+        a, b, x, y = map(int, pair.replace(",", "-").split("-"))
 
-        first_pair_numbers = set(
-            range(int(first_pair.split("-")[0]), int(first_pair.split("-")[1]) + 1)
-        )
-        second_pair_numbers = set(
-            range(int(second_pair.split("-")[0]), int(second_pair.split("-")[1]) + 1)
-        )
+        first_pair_numbers = set(range(a, b + 1))
+        second_pair_numbers = set(range(x, y + 1))
 
         if (
             first_pair_numbers <= second_pair_numbers
