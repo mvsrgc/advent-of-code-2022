@@ -16,8 +16,19 @@ def part_one(cargo, moves):
         print(key, val)
 
 
-def part_two():
-    pass
+def part_two(cargo, moves):
+    columns = cargo
+
+    for move in moves:
+        num_crates, source, dest = [int(x) for x in move.split(" ") if x.isdigit()]
+        intermediary = []
+        for _ in range(num_crates):
+            crate = columns[source].pop(0)
+            intermediary.append(crate)
+        columns[dest][0:0] = intermediary
+
+    for key, val in enumerate(columns.items()):
+        print(key, val)
 
 
 if __name__ == "__main__":
@@ -32,4 +43,5 @@ if __name__ == "__main__":
             columns[col] = [line[i] for line in cargo if line[i].isalpha()]
             col += 1
 
-        part_one(columns, moves)
+        # part_one(columns, moves)
+        part_two(columns, moves)
