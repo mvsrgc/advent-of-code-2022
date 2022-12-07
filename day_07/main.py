@@ -12,26 +12,30 @@ class TreeNode:
 
     def add_child(self, child: TreeNode) -> None:
         child.parent = self
-        if child not in self.children:
-            self.children.append(child)
+        self.children.append(child)
 
     def print_tree(self) -> None:
-        spaces = " " * self.get_level() * 3
-        print(spaces + self.name)
+        spaces = " " * self.get_level() * 4
+        if self.size is None:
+            print(spaces + self.name)
+        else:
+            print(spaces + str(self.size) + "-" + self.name)
 
         if len(self.children) > 0:
             for child in self.children:
                 child.print_tree()
 
-    def search(self, name: str) -> TreeNode | None:
-        if self.name == name:
+    def search(self, name: str, size: int | None = None) -> TreeNode | None:
+        if self.name == name and self.size == size:
             return self
 
-        if len(self.children) > 0:
-            for child in self.children:
-                return child.search(name)
+        node = None
+        for child in self.children:
+            node = child.search(name, size)
+            if node is not None:
+                break
 
-        return None
+        return node
 
     def get_level(self) -> int:
         level = 0
@@ -44,7 +48,7 @@ class TreeNode:
         return level
 
     def __repr__(self) -> str:
-        return self.name
+        return f"{self.name} - {self.size}"
 
 
 if __name__ == "__main__":
@@ -55,53 +59,11 @@ if __name__ == "__main__":
     tree = TreeNode("/")
     last_dir = tree.search("/")
     for idx, line in enumerate(lines):
-        if line.startswith("$ cd .."):
-            if last_dir.parent is not None:
-                last_dir = last_dir.parent
-            else:
-                last_dir = tree.search("/")
-        if (
-            line.startswith("$ cd")
-            and not line.startswith("$ cd /")
-            and not line.startswith("$ cd ..")
-        ):
-            # directory change
-            folder_name = line.split(" ")[2]
-            node = tree.search(folder_name)
-            if node is not None:
-                last_dir.add_child(node)
-                last_dir = node
-            else:
-                if last_dir is not None:
-                    last_dir.add_child(TreeNode(folder_name))
-
-        if line.startswith("$ ls"):
-            # list of files and folders
-            count = 1
-            if idx + count < len(lines) - 1:
-                this_line = lines[idx + count]
-            while not this_line.startswith("$"):
-                if this_line.split(" ")[0] == "dir":
-                    # it's a dir
-                    node_name = this_line.split(" ")[1]
-                    node = TreeNode(name=node_name)
-                    if tree.search(node) == None:
-                        last_dir.add_child(node)
-                else:
-                    # it's a file
-                    node_name = this_line.split(" ")[1]
-                    node_size = int(this_line.split(" ")[0])
-                    node = TreeNode(name=node_name, size=node_size)
-                    if tree.search(node) == None:
-                        last_dir.add_child(node)
-
-                count += 1
-                this_line = lines[idx + count]
-
-    tree.print_tree()
+        pass
 
 
 def test_1():
+    print()
     tree = TreeNode("/")
     assert tree.children == []
 
@@ -117,10 +79,24 @@ def test_1():
     assert tree.children[0].get_level() == 1
     assert tree.children[0].children[0].get_level() == 2
 
-    folder_2_searched = tree.search("folder_2")
-    assert folder_2_searched.name == "folder_2"
-    assert tree.search("folder_3") == None
+    assert tree.search("folder_1") is not None
+    assert tree.search("folder_2") is not None
+    assert tree.search("folder_3") is None
 
-    tree.add_child(TreeNode("folder_3"))
-    assert len(tree.children) == 2
+    folder_3 = TreeNode("folder_3")
+    tree.add_child(folder_3)
+    assert tree.search("folder_3") is not None
+
+    file_node = TreeNode("duplicate.txt", 12345)
+    folder_3.add_child(file_node)
+
+    searched = tree.search("duplicate.txt", 12345)
+    assert searched.name == "duplicate.txt" and searched.size == 12345
+
+    duplicate_file_node = TreeNode("duplicate.txt", 54321)
+    folder_2.add_child(duplicate_file_node)
+
+    searched = tree.search("duplicate.txt", 54321)
+    assert searched.name == "duplicate.txt" and searched.size == 54321
+
     tree.print_tree()
