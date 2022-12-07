@@ -4,18 +4,19 @@ import pytest
 
 
 class TreeNode:
-    def __init__(self, name: str, data: str | None = None) -> None:
+    def __init__(self, name: str, size: int | None = None) -> None:
         self.name = name
-        self.data = data
+        self.size = size
         self.children: list[TreeNode] = []
         self.parent = None
 
     def add_child(self, child: TreeNode) -> None:
         child.parent = self
-        self.children.append(child)
+        if child not in self.children:
+            self.children.append(child)
 
     def print_tree(self) -> None:
-        spaces = ' ' * self.get_level() * 3
+        spaces = " " * self.get_level() * 3
         print(spaces + self.name)
 
         if len(self.children) > 0:
@@ -41,6 +42,63 @@ class TreeNode:
             p = p.parent
 
         return level
+
+    def __repr__(self) -> str:
+        return self.name
+
+
+if __name__ == "__main__":
+    lines = []
+    with open("input.txt") as file:
+        lines = file.read().strip().split("\n")
+
+    tree = TreeNode("/")
+    last_dir = tree.search("/")
+    for idx, line in enumerate(lines):
+        if line.startswith("$ cd .."):
+            if last_dir.parent is not None:
+                last_dir = last_dir.parent
+            else:
+                last_dir = tree.search("/")
+        if (
+            line.startswith("$ cd")
+            and not line.startswith("$ cd /")
+            and not line.startswith("$ cd ..")
+        ):
+            # directory change
+            folder_name = line.split(" ")[2]
+            node = tree.search(folder_name)
+            if node is not None:
+                last_dir.add_child(node)
+                last_dir = node
+            else:
+                if last_dir is not None:
+                    last_dir.add_child(TreeNode(folder_name))
+
+        if line.startswith("$ ls"):
+            # list of files and folders
+            count = 1
+            if idx + count < len(lines) - 1:
+                this_line = lines[idx + count]
+            while not this_line.startswith("$"):
+                if this_line.split(" ")[0] == "dir":
+                    # it's a dir
+                    node_name = this_line.split(" ")[1]
+                    node = TreeNode(name=node_name)
+                    if tree.search(node) == None:
+                        last_dir.add_child(node)
+                else:
+                    # it's a file
+                    node_name = this_line.split(" ")[1]
+                    node_size = int(this_line.split(" ")[0])
+                    node = TreeNode(name=node_name, size=node_size)
+                    if tree.search(node) == None:
+                        last_dir.add_child(node)
+
+                count += 1
+                this_line = lines[idx + count]
+
+    tree.print_tree()
 
 
 def test_1():

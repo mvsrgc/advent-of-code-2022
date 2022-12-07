@@ -5,6 +5,7 @@ COOKIE_FILE="cookie.txt"
 # create new directory for the day and replace input path in file
 DAY_PADDED=$(date +%d)
 DIR="day_$DAY_PADDED"
+mkdir "$DIR"
 cp -r "day_xx" "$DIR"
 sed -i '' "s/day_xx/$DIR/g" "$DIR/main.py"
 
