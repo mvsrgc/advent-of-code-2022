@@ -47,6 +47,18 @@ class TreeNode:
 
         return level
 
+    def get_size(self) -> int:
+        size = 0
+
+        for child in self.children:
+            size += child.get_size()
+
+        if self.size is not None:
+            return self.size
+
+        return size
+
+
     def __repr__(self) -> str:
         return f"{self.name} - {self.size}"
 
@@ -77,7 +89,7 @@ if __name__ == "__main__":
             last_dir = tree.search("/")
 
         if line.startswith("$ ls"):
-            for i in range(9999):
+            for i in range(9999):  # yeah...
                 if idx + i + 1 > len(lines) - 1:
                     break
 
@@ -144,13 +156,8 @@ def test_1():
     searched = tree.search("folder_3", 12345)
     assert searched.name == "folder_3" and searched.size == 12345
 
-    folder_2.add_child(TreeNode("folder_4"))
-
-    tree.add_child(TreeNode("folder_4"))
-
-    folder_3.add_child(TreeNode("folder_2"))
-
-    searched = tree.search("folder_4")
-    searched.add_child(TreeNode("yo", 123))
+    assert folder_2.get_size() == 54321
+    assert folder_3.get_size() == (12345 * 2)
+    assert tree.get_size() == (54321 + (12345 * 2))
 
     tree.print_tree()
