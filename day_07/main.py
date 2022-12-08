@@ -50,14 +50,24 @@ class TreeNode:
     def get_size(self) -> int:
         size = 0
 
+        if self.size:
+            size += self.size
+
         for child in self.children:
             size += child.get_size()
 
-        if self.size is not None:
-            return self.size
-
         return size
 
+    def get_at_most(self, most: int) -> int:
+        size = 0
+
+        if self.size and self.size <= most:
+            size += self.size
+
+        for child in self.children:
+            size += child.get_at_most(most)
+
+        return size
 
     def __repr__(self) -> str:
         return f"{self.name} - {self.size}"
@@ -105,13 +115,14 @@ if __name__ == "__main__":
                         continue
                     last_dir.add_child(TreeNode(dir_name))
                 else:
-                    size = ls_line.split(" ")[0]
+                    size = int(ls_line.split(" ")[0])
                     file_name = ls_line.split(" ")[1]
-                    searched = tree.search(size, file_name)
+                    searched = tree.search(file_name, size)
                     if searched is not None:
                         continue
                     last_dir.add_child(TreeNode(file_name, size))
     tree.print_tree()
+    print(tree.get_at_most(100000))
 
 
 def test_1():
@@ -156,8 +167,38 @@ def test_1():
     searched = tree.search("folder_3", 12345)
     assert searched.name == "folder_3" and searched.size == 12345
 
-    assert folder_2.get_size() == 54321
-    assert folder_3.get_size() == (12345 * 2)
-    assert tree.get_size() == (54321 + (12345 * 2))
+
+def test_2():
+    tree = TreeNode("/")
+
+    folder_a = TreeNode("a")
+    tree.add_child(folder_a)
+
+    folder_e = TreeNode("e")
+
+    folder_a.add_child(folder_e)
+
+    folder_e.add_child(TreeNode("i", 584))
+
+    folder_a.add_child(TreeNode("f", 29116))
+    folder_a.add_child(TreeNode("g", 2557))
+    folder_a.add_child(TreeNode("h.lst", 62596))
+
+    tree.add_child(TreeNode("b.txt", 14848514))
+    tree.add_child(TreeNode("c.dat", 8504156))
+
+    folder_d = TreeNode("d")
+    tree.add_child(folder_d)
+    folder_d.add_child(TreeNode("j", 4060174))
+    folder_d.add_child(TreeNode("d.log", 8033020))
+    folder_d.add_child(TreeNode("d.ext", 5626152))
+    folder_d.add_child(TreeNode("k", 7214296))
+
+    assert folder_e.get_size() == 584
+    assert folder_a.get_size() == 94853
+    assert folder_d.get_size() == 24933642
+    assert tree.get_size() == 48381165
+
+    assert tree.get_at_most(100000) == 95437
 
     tree.print_tree()
