@@ -61,11 +61,9 @@ class TreeNode:
     def get_at_most(self, most: int) -> int:
         size = 0
 
-        if self.size and self.size <= most:
-            size += self.size
+        if self.get_size() <= most:
+            size += self.get_size()
 
-        for child in self.children:
-            size += child.get_at_most(most)
 
         return size
 
@@ -199,6 +197,8 @@ def test_2():
     assert folder_d.get_size() == 24933642
     assert tree.get_size() == 48381165
 
+    assert tree.get_at_most(500) == 0
+    assert tree.get_at_most(584) == 584
     assert tree.get_at_most(100000) == 95437
 
     tree.print_tree()
